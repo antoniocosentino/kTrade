@@ -44,12 +44,10 @@ namespace cAlgo
 
             if (_heikenAshi.xOpen.Last(1) < _heikenAshi.xClose.Last(1))
             {
-                // Print("New bar. Last bar was: GREEN");
                 candleslist.Add("green");
             }
             else
             {
-                // Print("New bar. Last bar was: RED");
                 candleslist.Add("red");
             }
 
@@ -61,11 +59,8 @@ namespace cAlgo
             }
             else
             {
-                // remove first value from array
                 candleslist.RemoveAt(0);
             }
-
-            //candleslist.ForEach(kval => Print(kval));
 
             foreach (string value in candleslist)
             {
@@ -134,13 +129,8 @@ namespace cAlgo
                     }
                 }
             }
-
-
-            Print(" - - - ");
-
-
         }
-        // closing on bar case
+        // end of on bar event
         protected override void OnTick()
         {
             // Put your core logic here

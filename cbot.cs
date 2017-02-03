@@ -28,6 +28,9 @@ namespace cAlgo
         [Parameter("Candles Sequence", DefaultValue = 2, MinValue = 1, MaxValue = 20)]
         public int csequence { get; set; }
 
+        [Parameter("Invert Buy/Sell", DefaultValue = false)]
+        public bool inverted { get; set; }
+
         // Time Parameters
         [Parameter("0:00 - 0:29", DefaultValue = true)]
         public bool timeslot_00 { get; set; }
@@ -192,6 +195,9 @@ namespace cAlgo
             currentminute = 0;
             currentslotnumber = 0;
             botactive = false;
+
+            candleslist.Clear();
+            blackslots.Clear();
 
             // Adding "black" hours
 
@@ -513,11 +519,25 @@ namespace cAlgo
             {
                 if (value == "green")
                 {
-                    pointscounter++;
+                    if (inverted)
+                    {
+                        pointscounter--;
+                    }
+                    else
+                    {
+                        pointscounter++;
+                    }
                 }
                 else
                 {
-                    pointscounter--;
+                    if (inverted)
+                    {
+                        pointscounter++;
+                    }
+                    else
+                    {
+                        pointscounter--;
+                    }
                 }
             }
 

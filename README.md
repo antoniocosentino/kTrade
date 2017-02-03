@@ -1,4 +1,5 @@
-# kTrade
+![kTrade](/images/ktrade_logo.png?raw=true "kTrade Logo")
+
 A trading bot for cAlgo developed in C#
 
 ## Description

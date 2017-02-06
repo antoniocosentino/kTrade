@@ -14,6 +14,7 @@ namespace cAlgo
         private HeikenAshi _heikenAshi;
         private int kcounter;
         private int pointscounter;
+        private int outpoints;
         private bool is_position_open;
         private string position_type;
         private string stringdate;
@@ -22,11 +23,14 @@ namespace cAlgo
         private int currentslotnumber;
         private bool botactive;
 
-        [Parameter("Contracts (EURO)", DefaultValue = 100000, MinValue = 1000, MaxValue = 100000000)]
+        [Parameter("Contracts (EURO)", DefaultValue = 100000, MinValue = 1, MaxValue = 100000000)]
         public int ncontracts { get; set; }
 
-        [Parameter("Candles Sequence", DefaultValue = 2, MinValue = 1, MaxValue = 20)]
+        [Parameter("Candles Seq. IN", DefaultValue = 2, MinValue = 1, MaxValue = 20)]
         public int csequence { get; set; }
+
+        [Parameter("Candles Seq. OUT", DefaultValue = 2, MinValue = 1, MaxValue = 20)]
+        public int outsequence { get; set; }
 
         [Parameter("Invert Buy/Sell", DefaultValue = false)]
         public bool inverted { get; set; }
@@ -179,6 +183,7 @@ namespace cAlgo
         //
 
         public static List<string> candleslist = new List<string>();
+        public static List<string> outlist = new List<string>();
         public static List<int> blackslots = new List<int>();
 
         protected override void OnStart()
@@ -197,6 +202,7 @@ namespace cAlgo
             botactive = false;
 
             candleslist.Clear();
+            outlist.Clear();
             blackslots.Clear();
 
             // Adding "black" hours
@@ -449,6 +455,7 @@ namespace cAlgo
         {
             kcounter++;
             pointscounter = 0;
+            outpoints = 0;
 
             stringdate = Server.Time.AddHours(1).ToString("HH:mm");
 
@@ -498,10 +505,12 @@ namespace cAlgo
             if (_heikenAshi.xOpen.Last(1) < _heikenAshi.xClose.Last(1))
             {
                 candleslist.Add("green");
+                outlist.Add("green");
             }
             else
             {
                 candleslist.Add("red");
+                outlist.Add("red");
             }
 
 
@@ -541,6 +550,44 @@ namespace cAlgo
                 }
             }
 
+            if (outlist.Count <= outsequence)
+            {
+                // do nothing
+            }
+            else
+            {
+                outlist.RemoveAt(0);
+            }
+
+            foreach (string value in outlist)
+            {
+                if (value == "green")
+                {
+                    if (inverted)
+                    {
+                        outpoints--;
+                    }
+                    else
+                    {
+                        outpoints++;
+                    }
+                }
+                else
+                {
+                    if (inverted)
+                    {
+                        outpoints++;
+                    }
+                    else
+                    {
+                        outpoints--;
+                    }
+                }
+            }
+
+
+
+
             if (is_position_open == false)
             {
                 if (pointscounter == csequence || pointscounter == (csequence * -1))
@@ -567,30 +614,31 @@ namespace cAlgo
             else
             {
                 var position = Positions.Find("kTrade");
-                if (pointscounter == csequence || pointscounter == (csequence * -1))
+                if (outpoints == outsequence || outpoints == (outsequence * -1))
                 {
-                    if (pointscounter == csequence && position_type == "sell")
+                    if (outpoints == outsequence && position_type == "sell")
                     {
                         Print("Closing position");
                         if (position != null)
                         {
                             ClosePosition(position);
+                            is_position_open = false;
+                            position_type = null;
+                            candleslist.Clear();
+                            outlist.Clear();
                         }
-                        Print("Reversing position");
-                        var result = ExecuteMarketOrder(TradeType.Buy, Symbol, ncontracts, "kTrade");
-                        position_type = "buy";
-
                     }
-                    else if (pointscounter == (csequence * -1) && position_type == "buy")
+                    else if (outpoints == (outsequence * -1) && position_type == "buy")
                     {
                         Print("Closing position");
                         if (position != null)
                         {
                             ClosePosition(position);
+                            is_position_open = false;
+                            position_type = null;
+                            candleslist.Clear();
+                            outlist.Clear();
                         }
-                        Print("Reversing position");
-                        var result = ExecuteMarketOrder(TradeType.Sell, Symbol, ncontracts, "kTrade");
-                        position_type = "sell";
                     }
                     else
                     {

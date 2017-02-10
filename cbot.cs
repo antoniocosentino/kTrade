@@ -26,10 +26,10 @@ namespace cAlgo
         [Parameter("Contracts (EURO)", DefaultValue = 100000, MinValue = 1, MaxValue = 100000000)]
         public int ncontracts { get; set; }
 
-        [Parameter("Candles Seq. IN", DefaultValue = 2, MinValue = 1, MaxValue = 20)]
+        [Parameter("Candles Seq. IN", DefaultValue = 2, MinValue = 1, MaxValue = 100)]
         public int csequence { get; set; }
 
-        [Parameter("Candles Seq. OUT", DefaultValue = 2, MinValue = 1, MaxValue = 20)]
+        [Parameter("Candles Seq. OUT", DefaultValue = 2, MinValue = 1, MaxValue = 100)]
         public int outsequence { get; set; }
 
         [Parameter("Invert Buy/Sell", DefaultValue = false)]

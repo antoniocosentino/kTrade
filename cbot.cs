@@ -22,6 +22,7 @@ namespace cAlgo
         private int currentminute;
         private int currentslotnumber;
         private bool botactive;
+        private int hasclosedft;
 
         [Parameter("Contracts (EURO)", DefaultValue = 100000, MinValue = 1, MaxValue = 100000000)]
         public int ncontracts { get; set; }
@@ -34,6 +35,12 @@ namespace cAlgo
 
         [Parameter("Invert Buy/Sell", DefaultValue = false)]
         public bool inverted { get; set; }
+
+        [Parameter("Take Profit (pips)", DefaultValue = 0, MinValue = 0, MaxValue = 100000000)]
+        public int takeprofit { get; set; }
+
+        [Parameter("Restart After Profit", DefaultValue = false)]
+        public bool restartap { get; set; }
 
         // Time Parameters
         [Parameter("0:00 - 0:29", DefaultValue = true)]
@@ -200,10 +207,13 @@ namespace cAlgo
             currentminute = 0;
             currentslotnumber = 0;
             botactive = false;
+            hasclosedft = 0;
 
             candleslist.Clear();
             outlist.Clear();
             blackslots.Clear();
+
+            Positions.Closed += PositionsOnClosed;
 
             // Adding "black" hours
 
@@ -479,6 +489,11 @@ namespace cAlgo
             {
                 botactive = false;
 
+                if (hasclosedft == 1)
+                {
+                    hasclosedft = 2;
+                }
+
                 if (is_position_open)
                 {
                     Print("Closing active position");
@@ -492,7 +507,14 @@ namespace cAlgo
             }
             else
             {
-                botactive = true;
+                if (restartap)
+                {
+                    botactive = true;
+                }
+                else if (restartap == false && (hasclosedft == 2 || hasclosedft == 0))
+                {
+                    botactive = true;
+                }
             }
 
 
@@ -599,12 +621,26 @@ namespace cAlgo
 
                         if (pointscounter == csequence)
                         {
-                            var result = ExecuteMarketOrder(TradeType.Buy, Symbol, ncontracts, "kTrade");
+                            if (takeprofit > 0)
+                            {
+                                var result = ExecuteMarketOrder(TradeType.Buy, Symbol, ncontracts, "kTrade", 0, takeprofit);
+                            }
+                            else
+                            {
+                                var result = ExecuteMarketOrder(TradeType.Buy, Symbol, ncontracts, "kTrade");
+                            }
                             position_type = "buy";
                         }
                         else
                         {
-                            var result = ExecuteMarketOrder(TradeType.Sell, Symbol, ncontracts, "kTrade");
+                            if (takeprofit > 0)
+                            {
+                                var result = ExecuteMarketOrder(TradeType.Sell, Symbol, ncontracts, "kTrade", 0, takeprofit);
+                            }
+                            else
+                            {
+                                var result = ExecuteMarketOrder(TradeType.Sell, Symbol, ncontracts, "kTrade");
+                            }
                             position_type = "sell";
                         }
                     }
@@ -650,12 +686,28 @@ namespace cAlgo
         // end of on bar event
         protected override void OnTick()
         {
-            // Put your core logic here
+            // no onTick events
         }
 
         protected override void OnStop()
         {
-            // Put your deinitialization logic here
+            Print("kTrade stopped");
         }
+
+        private void PositionsOnClosed(PositionClosedEventArgs args)
+        {
+            var pos = args.Position;
+            Print("Position closed with €{0} profit", pos.GrossProfit);
+            is_position_open = false;
+            position_type = null;
+
+            if (!restartap)
+            {
+                hasclosedft = 1;
+                botactive = false;
+            }
+
+        }
+
     }
 }

@@ -196,8 +196,8 @@ namespace cAlgo
         protected override void OnStart()
         {
             // Put your initialization logic here
-            Print("kTrade 1.3 started");
-            Print("Server time is {0}", Server.Time.AddHours(1));
+            Print("kTrade 1.3.1 started");
+            Print("Server time is {0}", Server.Time.AddHours(0));
             _heikenAshi = Indicators.GetIndicator<HeikenAshi>(1);
             kcounter = 0;
             is_position_open = false;

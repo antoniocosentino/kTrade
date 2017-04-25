@@ -39,6 +39,9 @@ namespace cAlgo
         [Parameter("Take Profit (pips)", DefaultValue = 0, MinValue = 0, MaxValue = 100000000)]
         public int takeprofit { get; set; }
 
+        [Parameter("Stop Loss (pips)", DefaultValue = 0, MinValue = 0, MaxValue = 100000000)]
+        public int stoploss { get; set; }
+
         [Parameter("Restart After Profit", DefaultValue = false)]
         public bool restartap { get; set; }
 
@@ -621,26 +624,12 @@ namespace cAlgo
 
                         if (pointscounter == csequence)
                         {
-                            if (takeprofit > 0)
-                            {
-                                var result = ExecuteMarketOrder(TradeType.Buy, Symbol, ncontracts, "kTrade", 0, takeprofit);
-                            }
-                            else
-                            {
-                                var result = ExecuteMarketOrder(TradeType.Buy, Symbol, ncontracts, "kTrade");
-                            }
+                            var result = ExecuteMarketOrder(TradeType.Buy, Symbol, ncontracts, "kTrade", stoploss, takeprofit);
                             position_type = "buy";
                         }
                         else
                         {
-                            if (takeprofit > 0)
-                            {
-                                var result = ExecuteMarketOrder(TradeType.Sell, Symbol, ncontracts, "kTrade", 0, takeprofit);
-                            }
-                            else
-                            {
-                                var result = ExecuteMarketOrder(TradeType.Sell, Symbol, ncontracts, "kTrade");
-                            }
+                            var result = ExecuteMarketOrder(TradeType.Sell, Symbol, ncontracts, "kTrade", stoploss, takeprofit);
                             position_type = "sell";
                         }
                     }

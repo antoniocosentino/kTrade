@@ -1,3 +1,12 @@
+///-----------------------------------------------------------------
+///   Class:            kTrade BOT
+///   Description:    cAlgo trading bot
+///   Author:          Antonio Cosentino
+///   Version:         1.5.1
+///   Updated:        08/06/2017
+///-----------------------------------------------------------------
+
+
 using System;
 using System.Linq;
 using cAlgo.API;
@@ -342,7 +351,7 @@ namespace cAlgo
         protected override void OnStart()
         {
             // Put your initialization logic here
-            Print("kTrade 1.3.1 started");
+            Print("kTrade 1.5.1 started");
             Print("Server time is {0}", Server.Time.AddHours(0));
             _heikenAshi = Indicators.GetIndicator<HeikenAshi>(1);
             kcounter = 0;
@@ -764,14 +773,23 @@ namespace cAlgo
             currentminute = int.Parse(stringdate.Substring(3, 2));
             currentminute = Convert.ToInt32(stringdate.Substring(3, 2));
 
-            if (currentminute >= 30)
+            if (currentminute >= 0 && currentminute < 15)
             {
-                currentslotnumber = (currenthour * 2) + 1;
+                currentslotnumber = (currenthour * 4) + 0;
             }
-            else
+            else if (currentminute >= 15 && currentminute < 30)
             {
-                currentslotnumber = currenthour * 2;
+                currentslotnumber = (currenthour * 4) + 1;
             }
+            else if (currentminute >= 30 && currentminute < 45)
+            {
+                currentslotnumber = (currenthour * 4) + 2;
+            }
+            else if (currentminute >= 45 && currentminute <= 59)
+            {
+                currentslotnumber = (currenthour * 4) + 3;
+            }
+
 
 
             if (blackslots.Any(item => item == currentslotnumber))

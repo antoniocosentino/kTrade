@@ -1,9 +1,9 @@
 ///-----------------------------------------------------------------
 ///   Class:            kTrade BOT
-///   Description:    cAlgo trading bot
-///   Author:          Antonio Cosentino
-///   Version:         1.5.1
-///   Updated:        08/06/2017
+///   Description:      cAlgo trading bot
+///   Author:           Antonio Cosentino
+///   Version:          1.5.1
+///   Updated:          08/06/2017
 ///-----------------------------------------------------------------
 
 
